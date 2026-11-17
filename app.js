@@ -40,23 +40,33 @@
     clearTimeout(t._h); t._h = setTimeout(function () { t.hidden = true; }, 2200);
   }
 
-  /* tiny syntax highlighter */
+  /* tiny syntax highlighter — single pass over the RAW code, so the
+     spans it inserts are never re-scanned (the old multi-replace
+     version matched the word "class" inside its own <span class="...">
+     tags and leaked markup into the displayed code). */
   function highlight(code, lang) {
-    var out = esc(code);
-    out = out.replace(/(\/\/[^\n]*|#[^\n]*)/g, function (m) {
-      return lang === 'bash' && m.charAt(0) === '#' ? '<span class="tok-c">' + m + '</span>' : m;
-    });
     if (lang === 'bash') {
-      out = out.replace(/^(\$ [^\n]*)/gm, '<span class="tok-f">$1</span>');
-      return out;
+      return esc(code).split('\n').map(function (line) {
+        if (line.charAt(0) === '#') return '<span class="tok-c">' + line + '</span>';
+        if (line.slice(0, 2) === '$ ') return '<span class="tok-f">' + line + '</span>';
+        return line;
+      }).join('\n');
     }
-    out = out.replace(/(&quot;[^&]*?&quot;|"[^"\n]*"|'[^'\n]*'|`[^`\n]*`)/g, '<span class="tok-s">$1</span>');
-    out = out.replace(/(\/\/[^\n]*)/g, '<span class="tok-c">$1</span>');
     var kw = lang === 'sql'
-      ? /\b(SELECT|FROM|WHERE|INSERT|INTO|VALUES|UPDATE|SET|DELETE|ALTER|TABLE|ADD|COLUMN|CREATE|JOIN|LEFT|GROUP|BY|ORDER|LIMIT|OFFSET|RETURNING|PRIMARY|KEY|NOT|NULL|DEFAULT)\b/g
-      : /\b(import|from|export|class|extends|implements|constructor|return|new|const|let|async|await|if|else|throw|private|readonly|public|function|interface|type|typeof|default|this|try|catch)\b/g;
-    out = out.replace(kw, '<span class="tok-k">$1</span>');
-    out = out.replace(/\b(\d+)\b/g, '<span class="tok-n">$1</span>');
+      ? 'SELECT|FROM|WHERE|INSERT|INTO|VALUES|UPDATE|SET|DELETE|ALTER|TABLE|ADD|COLUMN|CREATE|JOIN|LEFT|GROUP|BY|ORDER|LIMIT|OFFSET|RETURNING|PRIMARY|KEY|NOT|NULL|DEFAULT'
+      : 'import|from|export|class|extends|implements|constructor|return|new|const|let|async|await|if|else|throw|private|readonly|public|function|interface|type|typeof|default|this|try|catch';
+    var comment = lang === 'sql' ? '(--[^\\n]*)' : '(\\/\\/[^\\n]*)';
+    var re = new RegExp(comment + '|(\'(?:[^\'\\\\\\n]|\\\\.)*\'|"(?:[^"\\\\\\n]|\\\\.)*"|`(?:[^`\\\\]|\\\\.)*`)|\\b(' + kw + ')\\b|\\b(\\d+)\\b', 'g');
+    var out = '', last = 0, m;
+    while ((m = re.exec(code)) !== null) {
+      out += esc(code.slice(last, m.index));
+      if (m[1]) out += '<span class="tok-c">' + esc(m[1]) + '</span>';
+      else if (m[2]) out += '<span class="tok-s">' + esc(m[2]) + '</span>';
+      else if (m[3]) out += '<span class="tok-k">' + esc(m[3]) + '</span>';
+      else if (m[4]) out += '<span class="tok-n">' + esc(m[4]) + '</span>';
+      last = m.index + m[0].length;
+    }
+    out += esc(code.slice(last));
     return out;
   }
   function codeBlockHTML(b) {
@@ -456,6 +466,7 @@
     }).join('') || '<div class="palette-item">چیزی پیدا نشد</div>';
   }
   $('#searchBtn').addEventListener('click', openPalette);
+  $('#paletteClose').addEventListener('click', closePalette);
   $('#palette').addEventListener('click', function (e) {
     if (e.target.id === 'palette') closePalette();
     var it = e.target.closest('.palette-item[data-step]');
