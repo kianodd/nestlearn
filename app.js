@@ -262,6 +262,10 @@
 
   /* ---------- init ---------- */
   renderSidebar();
-  var m = location.hash.match(/#\/step\/([\d.]+)/);
-  if (m && COURSE.allSteps.some(function (s) { return s.id === m[1]; })) openStep(m[1]);
+  function routeFromHash() {
+    var m = location.hash.match(/#\/step\/([\d.]+)/);
+    if (m && COURSE.allSteps.some(function (s) { return s.id === m[1]; })) openStep(m[1]);
+  }
+  routeFromHash();
+  window.addEventListener('hashchange', routeFromHash);
 })();

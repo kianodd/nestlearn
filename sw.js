@@ -1,5 +1,7 @@
-/* NestLearn service worker v1 — cache app shell + lessons for offline use. */
-const VERSION = 'nestlearn-shell-v1';
+/* NestLearn service worker v2 — network-first for HTML/JS/CSS/data (the v1
+   cache-first handler kept serving the old app.js after deploys, and mixed
+   old JS with new CSS); cache-first only for immutable fonts/icons. */
+const VERSION = 'nestlearn-shell-v2';
 const SHELL = [
   './',
   'index.html',
@@ -31,16 +33,32 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
+  var url = new URL(e.request.url);
+  var immutable = /\.(woff2|png|ico)$/.test(url.pathname);
+  if (immutable) {
+    // fonts/icons never change: cache-first is fine
+    e.respondWith(
+      caches.match(e.request, { ignoreSearch: true }).then((cached) => {
+        var network = fetch(e.request).then((res) => {
+          if (res.ok && url.origin === self.location.origin) {
+            var copy = res.clone();
+            caches.open(VERSION).then((c) => c.put(e.request, copy));
+          }
+          return res;
+        }).catch(() => cached);
+        return cached || network;
+      })
+    );
+    return;
+  }
+  // pages, scripts, styles, data: network first, cache only when offline
   e.respondWith(
-    caches.match(e.request, { ignoreSearch: true }).then((cached) => {
-      const network = fetch(e.request).then((res) => {
-        if (res.ok && new URL(e.request.url).origin === self.location.origin) {
-          const copy = res.clone();
-          caches.open(VERSION).then((c) => c.put(e.request, copy));
-        }
-        return res;
-      }).catch(() => cached);
-      return cached || network;
-    })
+    fetch(e.request).then((res) => {
+      if (res.ok && url.origin === self.location.origin) {
+        var copy = res.clone();
+        caches.open(VERSION).then((c) => c.put(e.request, copy));
+      }
+      return res;
+    }).catch(() => caches.match(e.request, { ignoreSearch: true }))
   );
 });
