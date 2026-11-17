@@ -141,6 +141,7 @@
 
   function renderDiagram() {
     var svg = $('#flowSvg');
+    svg.setAttribute('viewBox', '0 0 760 300'); // fresh full view per render; focusNode pans from here
     var hops = currentStep.hops;
     var defs = '<defs><pattern id="dots" width="16" height="16" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.3" fill="currentColor" opacity=".22"/></pattern></defs>';
     var bg = '<rect width="760" height="300" fill="url(#dots)" opacity=".5"/>';
