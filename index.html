@@ -66,19 +66,6 @@
         </div>
         <div class="intro-stats" id="introStats"></div>
       </div>
-      <div class="intro-flow" aria-hidden="true">
-        <svg viewBox="0 0 320 190" class="mini-flow">
-          <defs><pattern id="dots" width="14" height="14" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.2" fill="currentColor" opacity=".25"/></pattern></defs>
-          <rect width="320" height="190" fill="url(#dots)" rx="12"/>
-          <g class="mini-node" style="--d:.0s"><rect x="14" y="72" width="62" height="46" rx="9"/><text x="45" y="99">Client</text></g>
-          <g class="mini-node" style="--d:.15s"><rect x="104" y="30" width="62" height="46" rx="9"/><text x="135" y="57">Controller</text></g>
-          <g class="mini-node" style="--d:.3s"><rect x="104" y="118" width="62" height="46" rx="9"/><text x="135" y="145">Service</text></g>
-          <g class="mini-node" style="--d:.45s"><rect x="196" y="72" width="62" height="46" rx="9"/><text x="227" y="99">ORM</text></g>
-          <g class="mini-node" style="--d:.6s"><rect x="262" y="72" width="44" height="46" rx="9"/><text x="284" y="99">DB</text></g>
-          <path d="M76 95 H104 M166 53 H196 M166 141 H196 M258 95 H262" stroke-dasharray="4 4"/>
-          <circle class="mini-dot" r="5" fill="#E0234E"><animateMotion dur="4s" repeatCount="indefinite" path="M76 95 H104 V53 H196 V95 H262"/></circle>
-        </svg>
-      </div>
     </section>
 
     <section class="lesson" id="lessonView" hidden>
@@ -88,64 +75,16 @@
           <h2 id="lessonTitle"></h2>
           <p class="lesson-goal" id="lessonGoal"></p>
         </div>
-        <div class="view-toggle" role="tablist" aria-label="نوع نمایش">
-          <button id="viewNetwork" class="active" role="tab" aria-selected="true">Network</button>
-          <button id="viewSequence" role="tab" aria-selected="false">Sequence</button>
-        </div>
+
       </div>
 
-      <div class="stage-grid">
-        <div class="stage-col">
-          <div class="diagram-card">
-            <div class="diagram-head">
-              <span class="diagram-title" id="diagramTitle">جریان درخواست</span>
-              <span class="diagram-hint" id="diagramHint">روی یک ردیف جدول بزن تا به همان قدم بری</span>
-            </div>
-            <div class="diagram-wrap" id="diagramWrap">
-              <svg id="flowSvg" viewBox="0 0 760 300" role="img" aria-label="نمودار جریان درخواست"></svg>
-            </div>
-            <div class="seq-wrap" id="seqWrap" hidden>
-              <svg id="seqSvg" viewBox="0 0 760 340" role="img" aria-label="نمودار توالی"></svg>
-            </div>
-            <div class="player">
-              <button class="play-btn" id="playBtn" aria-label="پخش">
-                <svg class="ic-play" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                <svg class="ic-pause" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
-                <span id="playLabel">پخش</span>
-              </button>
-              <button class="ctl-btn" id="stepBtn">قدم بعدی</button>
-              <button class="ctl-btn" id="resetBtn">از اول</button>
-              <label class="speed">سرعت
-                <select id="speedSel" aria-label="سرعت پخش">
-                  <option value="0.5">۰٫۵×</option>
-                  <option value="1" selected>۱×</option>
-                  <option value="1.5">۱٫۵×</option>
-                  <option value="2">۲×</option>
-                </select>
-              </label>
-              <span class="player-status" id="playerStatus">آماده</span>
-            </div>
-          </div>
-
-          <div class="table-card">
-            <div class="table-head"><span>PACKET FLOW</span><span id="tableCount"></span></div>
-            <div class="table-scroll">
-              <table class="flow-table" id="flowTable">
-                <thead><tr><th>No.</th><th>Time</th><th>From</th><th>To</th><th>Type</th><th>Info</th><th>Size</th></tr></thead>
-                <tbody id="flowBody"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <div class="details-col" id="detailsCol">
+      <div class="details-col" id="detailsCol">
           <div class="details-card" id="detailsCard"></div>
           <div class="lesson-nav">
             <button class="ghost-btn" id="prevStep">قدم قبلی</button>
             <button class="primary-btn" id="nextStep">قدم بعدی</button>
           </div>
         </div>
-      </div>
     </section>
   </main>
 </div>
